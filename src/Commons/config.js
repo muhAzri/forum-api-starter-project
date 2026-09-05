@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import dotenv from 'dotenv';
 import path from 'path';
 

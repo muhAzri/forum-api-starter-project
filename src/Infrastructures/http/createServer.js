@@ -16,7 +16,8 @@ const createServer = async (container) => {
   app.use('/authentications', authentications(container));
   app.use('/threads', threads(container));
 
-  // Global error handler
+  // Global error handler (four params required so Express treats this as an error handler)
+  // eslint-disable-next-line no-unused-vars
   app.use((error, req, res, next) => {
     // bila response tersebut error, tangani sesuai kebutuhan
     const translatedError = DomainErrorTranslator.translate(error);
