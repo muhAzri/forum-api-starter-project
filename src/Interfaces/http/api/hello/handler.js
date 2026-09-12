@@ -7,7 +7,7 @@ class HelloHandler {
     res.status(200).json({
       status: 'success',
       data: {
-        message: 'Halo Dunia',
+        message: 'Hello World',
       },
     });
   }
