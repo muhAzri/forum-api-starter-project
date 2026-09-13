@@ -22,5 +22,5 @@ jobs:
             cd ${{ secrets.VPS_PROJECT_DIR }}
             git fetch origin main
             git reset --hard origin/main
-            docker compose up -d --build --remove-orphans
+            docker compose up -d --build --remove-orphans --wait
             docker image prune -f
