@@ -77,6 +77,7 @@ describe('a ThreadDetail entities', () => {
       content: 'sebuah comment',
       isDelete: false,
       replies: [],
+      likeCount: 0,
     });
     const payload = {
       id: 'thread-123',

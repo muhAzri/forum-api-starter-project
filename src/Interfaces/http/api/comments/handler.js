@@ -1,5 +1,6 @@
 import AddCommentUseCase from '../../../../Applications/use_case/AddCommentUseCase.js';
 import DeleteCommentUseCase from '../../../../Applications/use_case/DeleteCommentUseCase.js';
+import ToggleCommentLikeUseCase from '../../../../Applications/use_case/ToggleCommentLikeUseCase.js';
 
 class CommentsHandler {
   #container;
@@ -9,6 +10,7 @@ class CommentsHandler {
 
     this.postCommentHandler = this.postCommentHandler.bind(this);
     this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
+    this.putCommentLikeHandler = this.putCommentLikeHandler.bind(this);
   }
 
   async postCommentHandler(req, res, next) {
@@ -35,6 +37,23 @@ class CommentsHandler {
     try {
       const deleteCommentUseCase = this.#container.getInstance(DeleteCommentUseCase.name);
       await deleteCommentUseCase.execute(
+        req.params.threadId,
+        req.params.commentId,
+        req.user.id,
+      );
+
+      res.json({
+        status: 'success',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async putCommentLikeHandler(req, res, next) {
+    try {
+      const toggleCommentLikeUseCase = this.#container.getInstance(ToggleCommentLikeUseCase.name);
+      await toggleCommentLikeUseCase.execute(
         req.params.threadId,
         req.params.commentId,
         req.user.id,

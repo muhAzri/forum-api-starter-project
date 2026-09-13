@@ -9,16 +9,22 @@ class GetThreadDetailUseCase {
 
   #replyRepository;
 
-  constructor({ threadRepository, commentRepository, replyRepository }) {
+  #commentLikeRepository;
+
+  constructor({
+    threadRepository, commentRepository, replyRepository, commentLikeRepository,
+  }) {
     this.#threadRepository = threadRepository;
     this.#commentRepository = commentRepository;
     this.#replyRepository = replyRepository;
+    this.#commentLikeRepository = commentLikeRepository;
   }
 
   async execute(threadId) {
     const thread = await this.#threadRepository.getThreadById(threadId);
     const comments = await this.#commentRepository.getCommentsByThreadId(threadId);
     const replies = await this.#replyRepository.getRepliesByThreadId(threadId);
+    const likeCounts = await this.#commentLikeRepository.getLikeCountsByThreadId(threadId);
 
     const commentDetails = comments.map((comment) => new CommentDetail({
       id: comment.id,
@@ -35,6 +41,9 @@ class GetThreadDetailUseCase {
           username: reply.username,
           isDelete: reply.is_delete,
         })),
+      likeCount: Number(
+        likeCounts.find((likeCount) => likeCount.comment_id === comment.id)?.count || 0,
+      ),
     }));
 
     return new ThreadDetail({

@@ -9,11 +9,13 @@ class CommentDetail {
 
   #replies;
 
+  #likeCount;
+
   constructor(payload) {
     this.#verifyPayload(payload);
 
     const {
-      id, username, date, content, isDelete, replies,
+      id, username, date, content, isDelete, replies, likeCount,
     } = payload;
 
     this.#id = id;
@@ -21,6 +23,7 @@ class CommentDetail {
     this.#date = date;
     this.#replies = replies;
     this.#content = isDelete ? '**komentar telah dihapus**' : content;
+    this.#likeCount = likeCount;
   }
 
   get id() {
@@ -43,12 +46,17 @@ class CommentDetail {
     return this.#replies;
   }
 
+  get likeCount() {
+    return this.#likeCount;
+  }
+
   equals(other) {
     return other instanceof CommentDetail
       && this.#id === other.id
       && this.#username === other.username
       && this.#date === other.date
       && this.#content === other.content
+      && this.#likeCount === other.likeCount
       && this.#replies.length === other.replies.length
       && this.#replies.every((reply, index) => reply.equals(other.replies[index]));
   }
@@ -60,11 +68,12 @@ class CommentDetail {
       date: this.#date,
       replies: this.#replies,
       content: this.#content,
+      likeCount: this.#likeCount,
     };
   }
 
   #verifyPayload({
-    id, username, date, content, isDelete, replies,
+    id, username, date, content, isDelete, replies, likeCount,
   }) {
     if (
       !id
@@ -73,6 +82,7 @@ class CommentDetail {
       || content === undefined
       || isDelete === undefined
       || !replies
+      || likeCount === undefined
     ) {
       throw new Error('COMMENT_DETAIL.NOT_CONTAIN_NEEDED_PROPERTY');
     }
@@ -83,6 +93,7 @@ class CommentDetail {
       || typeof content !== 'string'
       || typeof isDelete !== 'boolean'
       || !Array.isArray(replies)
+      || typeof likeCount !== 'number'
     ) {
       throw new Error('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }

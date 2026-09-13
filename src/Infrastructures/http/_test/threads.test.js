@@ -5,6 +5,7 @@ import AuthenticationsTableTestHelper from '../../../../tests/AuthenticationsTab
 import ThreadsTableTestHelper from '../../../../tests/ThreadsTableTestHelper.js';
 import CommentsTableTestHelper from '../../../../tests/CommentsTableTestHelper.js';
 import RepliesTableTestHelper from '../../../../tests/RepliesTableTestHelper.js';
+import CommentLikesTableTestHelper from '../../../../tests/CommentLikesTableTestHelper.js';
 import container from '../../container.js';
 import createServer from '../createServer.js';
 
@@ -26,6 +27,7 @@ describe('/threads endpoint', () => {
   });
 
   afterEach(async () => {
+    await CommentLikesTableTestHelper.cleanTable();
     await RepliesTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
@@ -173,6 +175,14 @@ describe('/threads endpoint', () => {
         .delete(`/threads/${threadId}/comments/${firstCommentId}/replies/${firstReplyId}`)
         .set('Authorization', `Bearer ${secondAccessToken}`);
 
+      // like the first comment from both users
+      await request(app)
+        .put(`/threads/${threadId}/comments/${firstCommentId}/likes`)
+        .set('Authorization', `Bearer ${firstAccessToken}`);
+      await request(app)
+        .put(`/threads/${threadId}/comments/${firstCommentId}/likes`)
+        .set('Authorization', `Bearer ${secondAccessToken}`);
+
       // Action
       const response = await request(app).get(`/threads/${threadId}`);
 
@@ -195,10 +205,12 @@ describe('/threads endpoint', () => {
       expect(comment1.replies[0].id).toEqual(firstReplyId);
       expect(comment1.replies[0].content).toEqual('**balasan telah dihapus**');
       expect(comment1.replies[0].username).toEqual('johndoe');
+      expect(comment1.likeCount).toEqual(2);
 
       expect(comment2.id).toEqual(secondCommentId);
       expect(comment2.content).toEqual('**komentar telah dihapus**');
       expect(comment2.replies).toHaveLength(0);
+      expect(comment2.likeCount).toEqual(0);
     });
   });
 });

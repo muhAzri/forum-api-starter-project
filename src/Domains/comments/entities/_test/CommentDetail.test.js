@@ -23,6 +23,23 @@ describe('a CommentDetail entities', () => {
       content: 'sebuah comment',
       isDelete: 'bukan boolean',
       replies: [],
+      likeCount: 0,
+    };
+
+    // Action and Assert
+    expect(() => new CommentDetail(payload)).toThrowError('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+  });
+
+  it('should throw error when likeCount is not a number', () => {
+    // Arrange
+    const payload = {
+      id: 'comment-123',
+      username: 'dicoding',
+      date: '2021-08-08T07:22:33.555Z',
+      content: 'sebuah comment',
+      isDelete: false,
+      replies: [],
+      likeCount: '0',
     };
 
     // Action and Assert
@@ -38,6 +55,7 @@ describe('a CommentDetail entities', () => {
       content: 'sebuah comment',
       isDelete: false,
       replies: [],
+      likeCount: 2,
     };
 
     // Action
@@ -49,6 +67,7 @@ describe('a CommentDetail entities', () => {
     expect(commentDetail.date).toEqual(payload.date);
     expect(commentDetail.content).toEqual(payload.content);
     expect(commentDetail.replies).toEqual(payload.replies);
+    expect(commentDetail.likeCount).toEqual(payload.likeCount);
   });
 
   it('should display **komentar telah dihapus** when comment is deleted', () => {
@@ -60,6 +79,7 @@ describe('a CommentDetail entities', () => {
       content: 'sebuah comment',
       isDelete: true,
       replies: [],
+      likeCount: 0,
     };
 
     // Action
@@ -78,6 +98,7 @@ describe('a CommentDetail entities', () => {
       content: 'sebuah comment',
       isDelete: false,
       replies: [],
+      likeCount: 3,
     };
     const commentDetail = new CommentDetail(payload);
 
@@ -88,6 +109,7 @@ describe('a CommentDetail entities', () => {
       date: payload.date,
       replies: payload.replies,
       content: payload.content,
+      likeCount: payload.likeCount,
     });
   });
 
@@ -107,11 +129,13 @@ describe('a CommentDetail entities', () => {
       content: 'sebuah comment',
       isDelete: false,
       replies: [reply],
+      likeCount: 1,
     };
     const commentDetail = new CommentDetail(payload);
 
     // Action & Assert
     expect(commentDetail.equals(new CommentDetail(payload))).toBe(true);
     expect(commentDetail.equals(new CommentDetail({ ...payload, replies: [] }))).toBe(false);
+    expect(commentDetail.equals(new CommentDetail({ ...payload, likeCount: 2 }))).toBe(false);
   });
 });

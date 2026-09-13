@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import ThreadRepository from '../../../Domains/threads/ThreadRepository.js';
 import CommentRepository from '../../../Domains/comments/CommentRepository.js';
 import ReplyRepository from '../../../Domains/replies/ReplyRepository.js';
+import CommentLikeRepository from '../../../Domains/comment_likes/CommentLikeRepository.js';
 import ThreadDetail from '../../../Domains/threads/entities/ThreadDetail.js';
 import GetThreadDetailUseCase from '../GetThreadDetailUseCase.js';
 
@@ -54,9 +55,14 @@ describe('GetThreadDetailUseCase', () => {
       },
     ];
 
+    const mockLikeCounts = [
+      { 'comment_id': 'comment-123', count: '2' },
+    ];
+
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
+    const mockCommentLikeRepository = new CommentLikeRepository();
 
     mockThreadRepository.getThreadById = vi.fn()
       .mockImplementation(() => Promise.resolve(mockThread));
@@ -64,11 +70,14 @@ describe('GetThreadDetailUseCase', () => {
       .mockImplementation(() => Promise.resolve(mockComments));
     mockReplyRepository.getRepliesByThreadId = vi.fn()
       .mockImplementation(() => Promise.resolve(mockReplies));
+    mockCommentLikeRepository.getLikeCountsByThreadId = vi.fn()
+      .mockImplementation(() => Promise.resolve(mockLikeCounts));
 
     const getThreadDetailUseCase = new GetThreadDetailUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
+      commentLikeRepository: mockCommentLikeRepository,
     });
 
     // Action
@@ -78,6 +87,7 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockThreadRepository.getThreadById).toBeCalledWith(threadId);
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(threadId);
     expect(mockReplyRepository.getRepliesByThreadId).toBeCalledWith(threadId);
+    expect(mockCommentLikeRepository.getLikeCountsByThreadId).toBeCalledWith(threadId);
 
     expect(threadDetail.equals(new ThreadDetail({
       id: mockThread.id,
@@ -94,9 +104,11 @@ describe('GetThreadDetailUseCase', () => {
     expect(threadDetail.comments[0].replies).toHaveLength(2);
     expect(threadDetail.comments[0].replies[0].content).toEqual('sebuah balasan');
     expect(threadDetail.comments[0].replies[1].content).toEqual('**balasan telah dihapus**');
+    expect(threadDetail.comments[0].likeCount).toEqual(2);
 
     expect(threadDetail.comments[1].id).toEqual('comment-456');
     expect(threadDetail.comments[1].content).toEqual('**komentar telah dihapus**');
     expect(threadDetail.comments[1].replies).toHaveLength(0);
+    expect(threadDetail.comments[1].likeCount).toEqual(0);
   });
 });
