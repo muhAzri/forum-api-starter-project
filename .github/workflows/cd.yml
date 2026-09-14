@@ -24,3 +24,6 @@ jobs:
             git reset --hard origin/main
             docker compose up -d --build --remove-orphans --wait
             docker image prune -f
+            sudo cp nginx.conf /etc/nginx/sites-available/forum-api
+            sudo nginx -t
+            sudo systemctl reload nginx
